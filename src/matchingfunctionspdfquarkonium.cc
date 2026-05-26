@@ -29,6 +29,7 @@ namespace apfel
   }
   double C1ggpdfQuarkonium::Local(double const&) const
   {
+    // The factor of 2 in front of CA * zeta2 is suspicious
     return - 2 * CA * zeta2 + 2 * _BQc;
   }
 }
