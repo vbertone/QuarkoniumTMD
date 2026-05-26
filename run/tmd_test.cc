@@ -6,13 +6,13 @@
 
 #include <apfel/apfelxx.h>
 #include <quarkoniumtmd/tmdbuilderquarkonium.h>
+#include <quarkoniumtmd/sigmazero.h>
 
 // Main program
 int main()
 {
   // Vectors of masses and thresholds
   const std::vector<double> Thresholds = {0, 0, 0, sqrt(2), 4.5, 175};
-  //const std::vector<double> Thresholds = {0, 0, 0, 0, 0};
 
   // Running coupling
   apfel::AlphaQCD a{0.35, sqrt(2), Thresholds, apfel::FixedOrderAccuracy::NLO};
@@ -38,7 +38,7 @@ int main()
   // Kinematics
   const double Vs = 13000;
   const double y  = 0;
-  const double Q  = 3;
+  const double Q  = apfel::MJpsi;
 
   // Compute 'x1' and 'x2'
   const double x1 = Q * exp(y) / Vs;
@@ -78,27 +78,20 @@ int main()
   //apfel::DoubleExponentialQuadrature DEObj{};
   apfel::OgataQuadrature DEObj{};
 
-  // Phase-space reduction factor
-  apfel::TwoBodyPhaseSpace ps{20, -1, 2.4};
-
   // Compute predictions
-  const int nqT = 100;
+  const int nqT = 20;
   const double qTmin = 0.01;
-  const double qTmax = 3;
+  const double qTmax = 2;
   const double qTstp = ( qTmax - qTmin ) / ( nqT - 1 );
   std::cout << std::scientific;
   std::cout << "\n     Q         "
             << "       y        "
             << "      qT        "
             << " cross section  "
-            << " PS red. fact.  "
-            << "PV PS red. fact."
             << std::endl;
   for (double qT = qTmin; qT <= qTmax; qT += qTstp)
     std::cout << Q << "\t" << y << "\t" << qT << "\t"
-              << apfel::ConvFact * qT * 8 * M_PI * pow(apfel::alphaem, 2) * hcs / pow(Q, 3) / 9 * DEObj.transform(TMDLumib, qT) << "\t"
-              << ps.PhaseSpaceReduction(Q, y, qT) << "\t"
-              << ps.ParityViolatingPhaseSpaceReduction(Q, y, qT) << "\t"
+              << apfel::ConvFact * sigmazero(Alphas(Q), Q, "SV", apfel::QuarkoniumSpecies::Q_1S0_8) * qT * 8 * M_PI * pow(apfel::alphaem, 2) * hcs / pow(Q, 3) / 9 * DEObj.transform(TMDLumib, qT) << "\t"
               << std::endl;
   t.stop();
 
