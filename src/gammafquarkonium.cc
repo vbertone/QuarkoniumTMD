@@ -21,6 +21,8 @@ namespace apfel
       octet = true;
     else if(Species == Q_3P2_8)
       octet = true;
+    else if(Species == Q_approx)
+      octet = true;
     else if(Species == Q_3P2_1)
       octet = false;
     else

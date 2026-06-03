@@ -7,6 +7,7 @@
 #pragma once
 
 #include "quarkoniumtmd/constantsquarkonium.h"
+#include <cmath>
 
 namespace apfel
 {

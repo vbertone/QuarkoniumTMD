@@ -11,7 +11,7 @@
 
 namespace apfel
 {
-  enum QuarkoniumSpecies: int {Q_1S0_8, Q_3P0_8, Q_3P2_8, Q_3P2_1};
+  enum QuarkoniumSpecies: int {Q_1S0_8, Q_3P0_8, Q_3P2_8, Q_3P2_1, Q_approx};
 
   /**
    * @name Quarkonium mass
@@ -34,7 +34,7 @@ namespace apfel
     {"SV",   {{Q_1S0_8, 0.018},  {Q_3P0_8, 0.0405},    {Q_3P2_8, 0.02025},   {Q_3P2_1, 0.}}},
     {"BK11", {{Q_1S0_8, 0.0304}, {Q_3P0_8, -0.00908},  {Q_3P2_8, -0.0454},   {Q_3P2_1, 0.}}},
     {"C12",  {{Q_1S0_8, 0.089},  {Q_3P0_8, 0.0126},    {Q_3P2_8, 0.063},     {Q_3P2_1, 0.}}},
-    {"SYY",  {{Q_1S0_8, 0.1423}, {Q_3P0_8, -0.039375}, {Q_3P2_8, -0.196875}, {Q_3P2_1, 0.018}}},
+    {"SYY",  {{Q_1S0_8, 0.1423}, {Q_3P0_8, -0.039375}, {Q_3P2_8, -0.196875}, {Q_3P2_1, 0.018}, {Q_approx, 0.0197}}},
     };
   ///@}
 
@@ -50,4 +50,16 @@ namespace apfel
     {"Chib2",   {{"Upsilon", 0.18}}}
   };
   ///@}
+
+/**
+    * @name BQc coefficients
+    * @brief: NLO Corrections for onium production.
+    * Taken from Nucl. Phys. B 514 (1998) 245-309, see Eqs. (127), (129)-(131)
+   */
+   ///@{
+   const std::map <std::string, double> BQc = {{"1S08", 3.16}, {"3P08", 3.76}, {"3P28", 2.8}, {"3P21", 4.07}};
+   ///@}
+   ///@}
+
+
 }
