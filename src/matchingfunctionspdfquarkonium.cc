@@ -38,8 +38,8 @@ namespace apfel
   double C1ggpdfQuarkonium::Local(double const&) const
   {
     // The factor of 2 in front of CA * zeta2 is suspicious
-    double Cgg = - 2 * CA * zeta2 + 2 * _BQc;
-    std::cout << "Cgg: " << Cgg / 4. << std::endl;
+    // double Cgg = - 2 * CA * zeta2 + 2 * _BQc;
+    // std::cout << "Cgg: " << Cgg / 4. << std::endl;
     return - 2 * CA * zeta2 + 2 * _BQc;
   }
 }
