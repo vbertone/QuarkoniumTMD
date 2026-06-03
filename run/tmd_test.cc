@@ -5,29 +5,41 @@
 //
 
 #include <apfel/apfelxx.h>
+#include <LHAPDF/LHAPDF.h>
 #include <quarkoniumtmd/tmdbuilderquarkonium.h>
 #include <quarkoniumtmd/sigmazero.h>
 
 // Main program
 int main()
 {
-  // Vectors of masses and thresholds
-  const std::vector<double> Thresholds = {0, 0, 0, sqrt(2), 4.5, 175};
+  // Open LHAPDF set
+  LHAPDF::PDF* distpdf = LHAPDF::mkPDF("CT18NLO");
+
+  // Heavy-quark thresholds
+  std::vector<double> Thresholds;
+  for (auto const& v : distpdf->flavors())
+    if (v > 0 && v < 7)
+      Thresholds.push_back(distpdf->quarkThreshold(v) < 0.5 ? 0 : distpdf->quarkThreshold(v));
 
   // Running coupling
-  apfel::AlphaQCD a{0.35, sqrt(2), Thresholds, apfel::FixedOrderAccuracy::NLO};
-  const apfel::TabulateObject<double> tabas{a, 500, 0.9, 1001, 3};
-  const auto Alphas = [=] (double const& mu) -> double{ return tabas.Evaluate(mu); };
+  const auto Alphas = [&] (double const& mu) -> double{ return distpdf->alphasQ(mu); };
 
   // x-space grid
   const apfel::Grid g{{apfel::SubGrid{100, 1e-5, 3}, apfel::SubGrid{100, 1e-1, 3}, apfel::SubGrid{100, 6e-1, 3}, apfel::SubGrid{80, 8.5e-1, 5}}};
 
-  // Construct the DGLAP objects
-  const auto EvolvedPDFs = BuildDglap(InitializeDglapObjectsQCD(g, Thresholds), apfel::LHToyPDFs, sqrt(2), apfel::FixedOrderAccuracy::NLO, Alphas);
+  // Rotate PDF set into the QCD evolution basis
+  const auto RotPDFs = [=] (double const& x, double const& mu) -> std::map<int,double> { return apfel::PhysToQCDEv(distpdf->xfxQ(x,mu)); };
 
-  // Tabulate PDFs
-  const apfel::TabulateObject<apfel::Set<apfel::Distribution>> TabPDFs{*EvolvedPDFs, 200, 1, 20000, 3};
-  const auto CollPDFs = [=] (double const& mu) -> apfel::Set<apfel::Distribution> { return TabPDFs.Evaluate(mu); };
+  // Construct set of distributions as a function of the scale to be
+  // tabulated
+  const auto EvolvedPDFs = [=,&g] (double const& mu) -> apfel::Set<apfel::Distribution>
+  {
+    return apfel::Set<apfel::Distribution>{apfel::EvolutionBasisQCD{apfel::NF(mu, Thresholds)}, DistributionMap(g, RotPDFs, mu)};
+  };
+
+  // Tabulate collinear PDFs
+  const apfel::TabulateObject<apfel::Set<apfel::Distribution>> TabPDFs{EvolvedPDFs, 200, distpdf->qMin(), distpdf->qMax(), 3, Thresholds};
+  const auto CollPDFs = [&] (double const& mu) -> apfel::Set<apfel::Distribution> { return TabPDFs.Evaluate(mu); };
 
   // Get timer
   apfel::Timer t;
@@ -48,7 +60,7 @@ int main()
   const auto EvTMDPDFs = BuildTmdPDFs(TmdObj, CollPDFs, Alphas, apfel::LogAccuracy::NLLp);
 
   // Get Drell-Yan hard-factor function
-  const double hcs = 1;//HardFactor("DY", TmdObj, Alphas, apfel::LogAccuracy::NNNLL)(Q);
+  const double hcs = 1;
 
   // Get Evolved TMD PDFs at bmax. This is subtracted off from the
   // b-dependent luminosity to improve the convergence of the Hankel
@@ -61,13 +73,13 @@ int main()
   const std::function<double(double const&)> TMDLumib = [=] (double const& b) -> double
   {
     // Compute b*
-    const double bstar = std::max(b / sqrt( 1 + pow(b / 2 / exp( - apfel::emc), 2) ), 1e-4);
+    const double bstar = std::max(b / sqrt( 1 + pow(b * distpdf->qMin() / 2 / exp( - apfel::emc), 2) ), 1e-4);
 
     // Get Evolved TMD PDFs and rotate them into the physical
     // basis
     const std::map<int,apfel::Distribution> xF = QCDEvToPhys(EvTMDPDFs(bstar, Q, Q * Q).GetObjects());
 
-    // Combine TMDs through the EW charges
+    // Combine TMDs
     double lumi = xF.at(0).Evaluate(x1) * xF.at(0).Evaluate(x2);
 
     // Combine all pieces and return
@@ -75,8 +87,8 @@ int main()
   };
 
   // Double exponential quadrature
-  //apfel::DoubleExponentialQuadrature DEObj{};
-  apfel::OgataQuadrature DEObj{};
+  apfel::DoubleExponentialQuadrature DEObj{};
+  //apfel::OgataQuadrature DEObj{};
 
   // Compute predictions
   const int nqT = 20;
