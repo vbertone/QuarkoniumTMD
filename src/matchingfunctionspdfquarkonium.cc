@@ -15,7 +15,6 @@ namespace apfel
   C1ggpdfQuarkonium::C1ggpdfQuarkonium(QuarkoniumSpecies const& Species):
     Expression()
   {
-    std::cout << 35.  / 27 << " ... " << 35  / 27 << std::endl;
     // Reference: https://arxiv.org/pdf/hep-ph/9707223v2
     if (Species == Q_1S0_8){
       _BQc = CF * ( - 5 + Pi2 / 4 ) + CA * ( 2 + 7 * Pi2 / 24 ); // Eq. (129)
