@@ -21,7 +21,7 @@ namespace apfel
       std::cout << "BQc: " << _BQc << std::endl;
     }
     else if(Species == Q_3P0_8){
-      _BQc = CF * ( - 7 / 3 + Pi2 / 4 ) + CA * ( 17. / 54 + (35  / 27 ) * log(2)+ 7 * Pi2 / 24 ); // Eq. (130)
+      _BQc = CF * ( - 7 / 3 + Pi2 / 4 ) + CA * ( 17. / 54 + 35.  / 27 * log(2)+ 7 * Pi2 / 24 ); // Eq. (130)
       std::cout << "BQc: " << _BQc << std::endl;
     }
     else if(Species == Q_3P2_8){
