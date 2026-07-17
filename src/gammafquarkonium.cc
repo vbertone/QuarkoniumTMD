@@ -27,7 +27,7 @@ namespace apfel
       octet = false;
     else
       throw std::runtime_error(error("gammaFg0Quarkonium", "Unknown quarkonium species"));
-
+ 
     return - ( - 22 * CA / 3 + 8 * TR * nf / 3 - (octet ? 2 * CA : 0) );
   }
 }
