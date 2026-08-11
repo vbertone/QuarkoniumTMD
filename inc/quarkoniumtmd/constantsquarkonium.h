@@ -11,7 +11,19 @@
 
 namespace apfel
 {
+  /**
+   * @brief Fock state of the heavy-quark pair produced in the hard
+   * process. "Q_approx" is the approximated combination of the 1S0[8]
+   * and 3P0[8] channels a la Sun-Yuan-Yuan.
+   */
   enum QuarkoniumSpecies: int {Q_1S0_8, Q_3P0_8, Q_3P2_8, Q_3P2_1, Q_approx};
+
+  /**
+   * @brief Quarkonium family, i.e. the observed quarkonium state:
+   * charmonium (J/psi, with the chi_c2 feed-down) or bottomonium
+   * (Upsilon(1S), with the chi_b2 feed-down).
+   */
+  enum QuarkoniumFamily: int {Charmonium, Bottomonium};
 
   /**
    * @name Quarkonium mass
@@ -26,21 +38,51 @@ namespace apfel
   ///@}
 
   /**
-   * @name LDMEs
-   * @brief Quarkonia Long Distance Matrix Elements. 
+   * @name Family lookups
+   * @brief Mass of the observed quarkonium, mass of the chi_2 state
+   * that feeds down into it, and names of the two states as used in
+   * the "Br" map below, for each quarkonium family.
    */
   ///@{
-  const std::map<std::string, std::map<QuarkoniumSpecies, double>> LDME = {
-    {"SV",   {{Q_1S0_8, 0.018},  {Q_3P0_8, 0.0405},    {Q_3P2_8, 0.02025},   {Q_3P2_1, 0.}}},
-    {"BK11", {{Q_1S0_8, 0.0304}, {Q_3P0_8, -0.00908},  {Q_3P2_8, -0.0454},   {Q_3P2_1, 0.}}},
-    {"C12",  {{Q_1S0_8, 0.089},  {Q_3P0_8, 0.0126},    {Q_3P2_8, 0.063},     {Q_3P2_1, 0.}}},
-    {"SYY",  {{Q_1S0_8, 0.1423}, {Q_3P0_8, -0.039375}, {Q_3P2_8, -0.196875}, {Q_3P2_1, 0.018}, {Q_approx, 0.0197}}},
-    };
+  const std::map<QuarkoniumFamily, double> MOnium = {{Charmonium, MJpsi},   {Bottomonium, MUpsilon}};
+  const std::map<QuarkoniumFamily, double> MChi2  = {{Charmonium, MChic2},  {Bottomonium, MChib2}};
+
+  const std::map<QuarkoniumFamily, std::string> OniumName = {{Charmonium, "Jpsi"},  {Bottomonium, "Upsilon"}};
+  const std::map<QuarkoniumFamily, std::string> Chi2Name  = {{Charmonium, "Chic2"}, {Bottomonium, "Chib2"}};
   ///@}
 
-    /**
-   * @name Branching mass
-   * @brief Mass of the quarkonia. To Do: choose PDG values or not
+  /**
+   * @name LDMEs
+   * @brief Quarkonia Long Distance Matrix Elements, in GeV^3 for the
+   * S-wave states and in GeV^5 for the P-wave ones. The map is
+   * indexed by quarkonium family, then by the tag of the
+   * determination, then by Fock state.
+   */
+  ///@{
+  const std::map<QuarkoniumFamily, std::map<std::string, std::map<QuarkoniumSpecies, double>>> LDME =
+  {
+    {
+      Charmonium,
+      {
+        {"SV",   {{Q_1S0_8, 0.018},  {Q_3P0_8, 0.0405},    {Q_3P2_8, 0.02025},   {Q_3P2_1, 0.}}},
+        {"BK11", {{Q_1S0_8, 0.0304}, {Q_3P0_8, -0.00908},  {Q_3P2_8, -0.0454},   {Q_3P2_1, 0.}}},
+        {"C12",  {{Q_1S0_8, 0.089},  {Q_3P0_8, 0.0126},    {Q_3P2_8, 0.063},     {Q_3P2_1, 0.}}},
+        {"SYY",  {{Q_1S0_8, 0.1423}, {Q_3P0_8, -0.039375}, {Q_3P2_8, -0.196875}, {Q_3P2_1, 0.018}, {Q_approx, 0.0197}}}
+      }
+    },
+    {
+      Bottomonium,
+      {
+        {"SYY",  {{Q_1S0_8, 0.119},  {Q_3P0_8, -0.27075},  {Q_3P2_8, -1.35375},  {Q_3P2_1, 0.3382}, {Q_approx, 0.0321}}}
+      }
+    }
+  };
+  ///@}
+
+  /**
+   * @name Branching ratios
+   * @brief Leptonic branching ratios of the observed quarkonia and
+   * branching ratios of the chi_2 states into them.
    */
   ///@{
   const std::map<std::string, std::map<std::string, double> > Br = {
