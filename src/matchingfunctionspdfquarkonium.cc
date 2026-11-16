@@ -5,6 +5,7 @@
 //
 
 #include "quarkoniumtmd/matchingfunctionspdfquarkonium.h"
+#include "quarkoniumtmd/hardfactorquarkonium.h"
 
 #include <apfel/constants.h>
 #include <apfel/messages.h>
@@ -15,27 +16,15 @@ namespace apfel
   C1ggpdfQuarkonium::C1ggpdfQuarkonium(QuarkoniumSpecies const& Species):
     Expression()
   {
-    // Reference: https://arxiv.org/pdf/hep-ph/9707223v2
-    if (Species == Q_1S0_8){
-      _BQc = CF * ( - 5 + Pi2 / 4 ) + CA * ( 2 + 7 * Pi2 / 24 ); // Eq. (129)
-    }
-    else if(Species == Q_3P0_8){
-      _BQc = CF * ( - 7. / 3 + Pi2 / 4 ) + CA * ( 17. / 54 + 35.  / 27 * log(2)+ 7 * Pi2 / 24 ); // Eq. (130)
-    }
-    else if(Species == Q_3P2_8){
-      _BQc = - 4 * CF + CA * ( 23. / 36 + 7 * log(2) / 9 + 5 * Pi2 / 12 ); // Eq. (131)
-    }
-    else if(Species == Q_3P2_1){
-      _BQc = - 4 * CF + CA * ( 1. / 3 + 5 * log(2) / 3. + Pi2 / 6 ); // Eq. (127)
-    }
-    else if(Species == Q_approx){
-      _BQc = CF * ( - 5 + Pi2 / 4 ) + CA * ( 2 + 7 * Pi2 / 24 ); // Eq. (129)
-    }
-    else
-      throw std::runtime_error(error("C1ggpdfQuarkonium", "Unknown quarkonium species"));
+    // Only check that the species is known (throws otherwise). The
+    // NLO virtual constant B no longer enters here.
+    BQuarkonium(Species);
   }
   double C1ggpdfQuarkonium::Local(double const&) const
   {
-    return - CA * zeta2 + _BQc / 2.;
+    // Universal C_gg^(1) (coefficient of alpha_s / 4 pi). The NLO
+    // virtual constant B now enters the hard factor
+    // (see HardFactorQuarkonium in hardfactorquarkonium.h).
+    return - CA * zeta2;
   }
 }

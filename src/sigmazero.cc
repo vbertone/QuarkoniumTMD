@@ -39,9 +39,9 @@ namespace apfel
     else if(Species == Q_3P2_1)
       return 64. / 15. * pow(alphas, 2) * pow(M_PI, 3) / pow(M, 7) * ldme;
     else if(Species == Q_approx)
-      // @note No B_Qc factor here: the NLO coefficients of
-      // Nucl. Phys. B 514 (1998) 245 enter the matching function
-      // C1ggpdfQuarkonium.
+      // @note No B_Qc factor here: the NLO virtual constant B of
+      // Nucl. Phys. B 514 (1998) 245 enters the one-loop hard factor
+      // HardFactorQuarkonium (hardfactorquarkonium.h).
       return 5. / 12. * pow(alphas, 2) * pow(M_PI, 3) / pow(M, 5) * ldme;
     else
       throw std::runtime_error(error("sigmazero", "Unknown quarkonium species"));

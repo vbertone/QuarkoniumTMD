@@ -17,7 +17,5 @@ namespace apfel
   public:
     C1ggpdfQuarkonium(QuarkoniumSpecies const& Species);
     double Local(double const&) const;
-  private:
-    double _BQc;
   };
 }
